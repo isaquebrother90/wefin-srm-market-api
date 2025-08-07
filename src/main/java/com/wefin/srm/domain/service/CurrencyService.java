@@ -43,7 +43,8 @@ public class CurrencyService {
     }
 
     public ExchangeRateDto getMostRecentRate(String fromCurrencyCode, String toCurrencyCode) {
-        ExchangeRate rate = exchangeRateRepository.findMostRecentRate(fromCurrencyCode, toCurrencyCode)
+        ExchangeRate rate =
+                exchangeRateRepository.findTopByFromCurrencyCodeAndToCurrencyCodeOrderByEffectiveDateDescIdDesc(fromCurrencyCode, toCurrencyCode)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("Exchange rate from %s to %s not found.", fromCurrencyCode, toCurrencyCode)));
         return toDto(rate);

@@ -13,7 +13,6 @@ import com.wefin.srm.domain.repository.ProductRepository;
 import com.wefin.srm.domain.repository.TransactionRepository;
 import com.wefin.srm.domain.service.conversion.ConversionStrategy;
 import com.wefin.srm.domain.service.conversion.ConversionStrategyFactory;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +38,6 @@ public class TransactionService {
 
     @Transactional
     public TransactionResponseDto executeExchange(ConversionRequestDto request) {
-        // 1. Validar entidades
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + request.getProductId()));
 
@@ -50,7 +48,7 @@ public class TransactionService {
                 .orElseThrow(() -> new ResourceNotFoundException("Currency not found: " + request.getToCurrencyCode()));
 
         // 2. Obter a taxa de câmbio mais recente
-        ExchangeRate exchangeRate = exchangeRateRepository.findMostRecentRate(request.getFromCurrencyCode(), request.getToCurrencyCode())
+        ExchangeRate exchangeRate = exchangeRateRepository.findTopByFromCurrencyCodeAndToCurrencyCodeOrderByEffectiveDateDescIdDesc(request.getFromCurrencyCode(), request.getToCurrencyCode())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("Exchange rate from %s to %s not found.", request.getFromCurrencyCode(), request.getToCurrencyCode())));
 

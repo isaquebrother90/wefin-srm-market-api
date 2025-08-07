@@ -1,6 +1,5 @@
 package com.wefin.srm.config;
 
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -8,6 +7,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,55 +23,46 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    // Lista de URLs que devem ser públicas
-    private static final String[] PUBLIC_URLS = {
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/api/v1/transactions/exchange",
-            "/api/v1/rates/**"
-    };
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http ) throws Exception {
-        http
-                .csrf(csrf -> {
-                    // Desabilita o CSRF para a API e o console H2
-                    csrf.ignoringRequestMatchers(PathRequest.toH2Console( ));
-                    csrf.disable(); // Se você ainda precisar desabilitar globalmente
-                })
-                .headers(headers -> headers
-                        // Permite que o console H2 seja renderizado em um frame
-                        .frameOptions(frameOptions -> frameOptions.sameOrigin())
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        // Permite acesso irrestrito ao console H2
-                        .requestMatchers(PathRequest.toH2Console()).permitAll()
-                        // Permite acesso público a todas as URLs na lista PUBLIC_URLS
-                        .requestMatchers(PUBLIC_URLS).permitAll()
-
-                        // Apenas ADMIN pode atualizar taxas
-                        .requestMatchers(HttpMethod.POST, "/api/v1/rates").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
-                .httpBasic(Customizer.withDefaults( ));
-
-        return http.build( );
+    public WebSecurityCustomizer webSecurityCustomizer( ) {
+        // Instrua o Spring Security a IGNORAR completamente qualquer requisição para estes caminhos.
+        // Isso é mais eficaz do que .permitAll() para recursos estáticos e de documentação.
+        return (web) -> web.ignoring().requestMatchers(
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/h2-console/**"
+        );
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder().encode("password"))
-                .roles("ADMIN")
-                .build();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http ) throws Exception {
+        return http
+                .csrf(AbstractHttpConfigurer::disable )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-        return new InMemoryUserDetailsManager(admin);
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/api/v1/rates").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/transactions/exchange").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/rates/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .httpBasic(Customizer.withDefaults( ))
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
+                .build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+        UserDetails admin = User.builder()
+                .username("admin")
+                .password(passwordEncoder.encode("password"))
+                .roles("ADMIN")
+                .build();
+        return new InMemoryUserDetailsManager(admin);
     }
 }
