@@ -1,15 +1,17 @@
 package com.wefin.srm.domain.service.conversion;
 
 import com.wefin.srm.domain.model.Product;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-@RequiredArgsConstructor
 public class ConversionStrategyFactory {
 
     private final Map<String, ConversionStrategy> strategies;
+
+    public ConversionStrategyFactory(Map<String, ConversionStrategy> strategies) {
+        this.strategies = strategies;
+    }
 
     public ConversionStrategy getStrategy(Product product) {
         if ("Hidromel dos Anãos".equals(product.getName()) && "Montanhas de Ferro".equals(product.getOriginRealm())) {

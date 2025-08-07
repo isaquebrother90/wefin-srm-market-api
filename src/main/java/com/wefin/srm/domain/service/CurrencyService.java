@@ -7,18 +7,21 @@ import com.wefin.srm.domain.model.Currency;
 import com.wefin.srm.domain.model.ExchangeRate;
 import com.wefin.srm.domain.repository.CurrencyRepository;
 import com.wefin.srm.domain.repository.ExchangeRateRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
 @Service
-@RequiredArgsConstructor
 public class CurrencyService {
 
     private final ExchangeRateRepository exchangeRateRepository;
     private final CurrencyRepository currencyRepository;
+
+    public CurrencyService(ExchangeRateRepository exchangeRateRepository, CurrencyRepository currencyRepository) {
+        this.exchangeRateRepository = exchangeRateRepository;
+        this.currencyRepository = currencyRepository;
+    }
 
     @Transactional
     public ExchangeRateDto updateRate(ExchangeRateUpdateDto dto) {
@@ -47,11 +50,12 @@ public class CurrencyService {
     }
 
     private ExchangeRateDto toDto(ExchangeRate rate) {
-        return ExchangeRateDto.builder()
-                .fromCurrency(rate.getFromCurrency().getCode())
-                .toCurrency(rate.getToCurrency().getCode())
-                .rate(rate.getRate())
-                .effectiveDate(rate.getEffectiveDate())
-                .build();
+        return new ExchangeRateDto(
+                rate.getFromCurrency().getCode(),
+                rate.getToCurrency().getCode(),
+                rate.getRate(),
+                rate.getEffectiveDate()
+        );
     }
+
 }

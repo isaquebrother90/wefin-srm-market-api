@@ -3,7 +3,9 @@ package com.wefin.srm.config;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,7 +19,16 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
+
+    // Lista de URLs que devem ser públicas
+    private static final String[] PUBLIC_URLS = {
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/api/v1/transactions/exchange",
+            "/api/v1/rates/**"
+    };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http ) throws Exception {
@@ -33,16 +44,13 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // --- INÍCIO DA CORREÇÃO ---
                         // Permite acesso irrestrito ao console H2
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
-                        // --- FIM DA CORREÇÃO ---
+                        // Permite acesso público a todas as URLs na lista PUBLIC_URLS
+                        .requestMatchers(PUBLIC_URLS).permitAll()
 
-                        // Regras que já tínhamos
-                        .requestMatchers("/api/v1/rates").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/transactions/exchange").permitAll()
-                        .requestMatchers("/api/v1/rates/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        // Apenas ADMIN pode atualizar taxas
+                        .requestMatchers(HttpMethod.POST, "/api/v1/rates").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults( ));
