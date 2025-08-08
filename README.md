@@ -13,7 +13,7 @@ A solução permite a consulta de taxas de câmbio, a realização de trocas em 
 
 O diagrama a seguir representa a arquitetura do banco de dados projetada para a solução. Ele inclui as tabelas para moedas, produtos, taxas de câmbio e o registro de transações, com seus respectivos relacionamentos e cardinalidades.
 
-```mermaid
+```
     USERS {
         bigint id PK
         varchar username UK
@@ -58,7 +58,7 @@ O diagrama a seguir representa a arquitetura do banco de dados projetada para a 
     CURRENCY ||--o{ TRANSACTION : "é moeda de destino"
     PRODUCT ||--o{ TRANSACTION : "é negociado em"
 ```
-
+![Modelagem Der](DER.svg)
 ---
 
 ## 3. Como Executar a Aplicação
