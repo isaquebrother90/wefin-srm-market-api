@@ -224,6 +224,7 @@ Este projeto representa uma base sólida. Para evoluir para um ambiente de produ
 
 *   **CI/CD:** Configurar um pipeline de Integração Contínua e Entrega Contínua (usando ferramentas como GitHub Actions, Jenkins ou GitLab CI) para automatizar a execução de testes, a verificação de cobertura (JaCoCo) e o deploy da aplicação.
 *   **Banco de Dados de Produção:** Migrar do H2 em memória para um banco de dados mais robusto, como PostgreSQL ou MySQL, utilizando Flyway ou Liquibase para gerenciar as migrações de schema.
+*   **Logs e auditoria:** Implementar o uso de libs como Slf4j, Logback, para registro e padronização de eventos.
 *   **Observabilidade:** Implementar um stack de monitoramento com Prometheus (para métricas), Grafana (para dashboards) e um sistema de logging centralizado (como o stack ELK), utilizando o Spring Boot Actuator como base.
 *   **Segurança Avançada:** Substituir a autenticação HTTP Basic por um fluxo mais seguro e flexível, como OAuth2/JWT, permitindo a integração com provedores de identidade.
 *   **Cache:** Implementar uma camada de cache (com Redis ou Caffeine) para as taxas de câmbio, que não mudam com frequência, a fim de melhorar a performance e reduzir a carga no banco de dados.
