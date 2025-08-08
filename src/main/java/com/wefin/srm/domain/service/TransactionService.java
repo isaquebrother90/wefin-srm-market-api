@@ -28,7 +28,8 @@ public class TransactionService {
     private final ExchangeRateRepository exchangeRateRepository;
     private final ConversionStrategyFactory conversionStrategyFactory;
 
-    public TransactionService(TransactionRepository transactionRepository, ProductRepository productRepository, CurrencyRepository currencyRepository, ExchangeRateRepository exchangeRateRepository, ConversionStrategyFactory conversionStrategyFactory) {
+    public TransactionService(TransactionRepository transactionRepository, ProductRepository productRepository, CurrencyRepository currencyRepository,
+                              ExchangeRateRepository exchangeRateRepository, ConversionStrategyFactory conversionStrategyFactory) {
         this.transactionRepository = transactionRepository;
         this.productRepository = productRepository;
         this.currencyRepository = currencyRepository;
@@ -47,18 +48,17 @@ public class TransactionService {
         Currency toCurrency = currencyRepository.findByCode(request.getToCurrencyCode())
                 .orElseThrow(() -> new ResourceNotFoundException("Currency not found: " + request.getToCurrencyCode()));
 
-        // 2. Obter a taxa de câmbio mais recente
+        //Busca a taxa de câmbio mais recente
         ExchangeRate exchangeRate = exchangeRateRepository.findTopByFromCurrencyCodeAndToCurrencyCodeOrderByEffectiveDateDescIdDesc(request.getFromCurrencyCode(), request.getToCurrencyCode())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("Exchange rate from %s to %s not found.", request.getFromCurrencyCode(), request.getToCurrencyCode())));
 
-        // 3. Obter a estratégia de conversão
         ConversionStrategy strategy = conversionStrategyFactory.getStrategy(product);
 
-        // 4. Calcular o valor convertido
+        //Calcula o valor convertido
         BigDecimal convertedAmount = strategy.calculate(request.getAmount(), exchangeRate.getRate());
 
-        // 5. Criar e salvar a transação
+        //Criar e salva a transação
         Transaction transaction = new Transaction();
         transaction.setProduct(product);
         transaction.setOriginalAmount(request.getAmount());
@@ -69,7 +69,6 @@ public class TransactionService {
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
-        // 6. Retornar DTO de resposta
         return new TransactionResponseDto(
                 savedTransaction.getId(),
                 product.getName(),

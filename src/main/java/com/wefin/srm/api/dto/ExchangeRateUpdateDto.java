@@ -8,6 +8,12 @@ public class ExchangeRateUpdateDto {
     private String toCurrencyCode;
     private BigDecimal rate;
 
+    public ExchangeRateUpdateDto(String fromCurrencyCode, String toCurrencyCode, BigDecimal rate) {
+        this.fromCurrencyCode = fromCurrencyCode;
+        this.toCurrencyCode = toCurrencyCode;
+        this.rate = rate;
+    }
+
     public String getFromCurrencyCode() {
         return fromCurrencyCode;
     }

@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 
 @Component("DEFAULT")
 public class DefaultConversionStrategy implements ConversionStrategy {
+
     @Override
     public BigDecimal calculate(BigDecimal amount, BigDecimal rate) {
         return amount.multiply(rate);

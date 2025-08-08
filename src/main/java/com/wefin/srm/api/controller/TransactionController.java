@@ -3,7 +3,6 @@ package com.wefin.srm.api.controller;
 import com.wefin.srm.api.dto.ConversionRequestDto;
 import com.wefin.srm.api.dto.TransactionResponseDto;
 import com.wefin.srm.domain.service.TransactionService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

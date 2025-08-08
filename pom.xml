@@ -27,7 +27,8 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
+		<jacoco.version>0.8.12</jacoco.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -75,14 +76,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</path>
-					</annotationProcessorPaths>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -93,6 +86,73 @@
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+					<!-- Prepara o agente do JaCoCo para instrumentar o código durante a fase de teste -->
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<!-- Gera o relatório de cobertura após a execução dos testes -->
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+					<!-- Verifica as regras de cobertura e falha a build se não forem atendidas -->
+					<execution>
+						<id>check</id>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<rule>
+									<element>BUNDLE</element>
+									<limits>
+										<!-- Exige que a cobertura de instruções seja de pelo menos 80% -->
+										<limit>
+											<counter>INSTRUCTION</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.80</minimum>
+										</limit>
+										<!-- Exige que a cobertura de branches (if/else, switch ) seja de 80% -->
+										<limit>
+											<counter>BRANCH</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.80</minimum>
+										</limit>
+									</limits>
+								</rule>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- Exclui classes que não precisam de cobertura de teste -->
+					<excludes>
+						<!-- Exclui a classe principal da aplicação -->
+						<exclude>com/wefin/srm/WefinSrmMarketApiApplication.class</exclude>
+						<!-- Exclui todas as classes de configuração -->
+						<exclude>com/wefin/srm/config/**</exclude>
+						<!-- Exclui todas as classes DTO -->
+						<exclude>com/wefin/srm/api/dto/**</exclude>
+						<!-- Exclui todas as classes Exception -->
+						<exclude>com/wefin/srm/api/exception/**</exclude>
+						<!-- Exclui todas as classes de modelo (Entidades) -->
+						<exclude>com/wefin/srm/domain/model/**</exclude>
+						<!-- Exclui todas as classes de exceção -->
+						<exclude>com/wefin/srm/domain/exception/**</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

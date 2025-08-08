@@ -14,6 +14,11 @@ public class ConversionStrategyFactory {
     }
 
     public ConversionStrategy getStrategy(Product product) {
+
+        if (product == null) {
+            return strategies.get("DEFAULT");
+        }
+
         if ("Hidromel dos Anãos".equals(product.getName()) && "Montanhas de Ferro".equals(product.getOriginRealm())) {
             return strategies.get("DWARF_HIDROMEL");
         }

@@ -17,8 +17,6 @@ import org.springframework.context.annotation.Configuration;
                 description = "API para o sistema de conversão de moedas do Mercado de Pulgas dos Mil Saberes.",
                 license = @License(name = "Apache 2.0", url = "http://springdoc.org" )
         ),
-        // Aplica o requisito de segurança "basicAuth" a TODOS os endpoints da API.
-        // O Swagger mostrará um cadeado em todos eles.
         security = {
                 @SecurityRequirement(name = "basicAuth")
         }

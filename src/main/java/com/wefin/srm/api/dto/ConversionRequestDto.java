@@ -3,7 +3,7 @@ package com.wefin.srm.api.dto;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class  ConversionRequestDto {
+public class ConversionRequestDto {
     private Long productId;
     private BigDecimal amount;
     private String fromCurrencyCode;
